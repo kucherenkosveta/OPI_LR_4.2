@@ -2,127 +2,133 @@
 # -*- coding: utf-8 -*-
 
 """
-Дополнительно к требуемым в заданиях операциям перегрузить операцию индексирования [].
-Максимально возможный размер списка задать константой. В отдельном поле size должно
-храниться максимальное для данного объекта количество элементов списка; реализовать метод
-size(), возвращающий установленную длину. Если количество элементов списка изменяется во
-время работы, определить в классе поле count. Первоначальные значения size и count
-устанавливаются конструктором.
-В тех задачах, где возможно, реализовать конструктор инициализации строкой.
-
-Карточка иностранного слова представляет собой словарейу, содержащую иностранное
-слово и его перевод. Для моделирования электронного словаря иностранных слов
-реализовать класс Dictionary. Данный класс имеет поле-название словаря и содержит
-список словарей WordCard, представляющих собой карточки иностранного слова. Название
-словаря задается при создании нового словаря, но должна быть предоставлена
-возможность его изменения во время работы. Карточки добавляются в словарь и удаляются
-из него. Реализовать поиск определенного слова как отдельный метод. Аргументом
-операции индексирования должно быть иностранное слово. В словаре не должно быть
-карточек-дублей. Реализовать операции объединения, пересечения и вычитания словарей.
-При реализации должен создаваться новый словарь, а исходные словари не должны
-изменяться. При объединении новый словарь должен содержать без повторений все слова,
-содержащиеся в обоих словарях-операндах. При пересечении новый словарь должен
-состоять только из тех слов, которые имеются в обоих словарях-операндах. При вычитании
-новый словарь должен содержать слова первого словаря-операнда, отсутствующие во
-втором.
+Товарный чек содержит список товаров, купленных покупателем в магазине. Один элемент
+списка представляет собой пару: товар-сумма. Товар — это класс Goods с полями кода и
+наименования товара, цены за единицу товара, количества покупаемых единиц товара. В
+классе должны быть реализованы методы доступа к полям для получения и изменения
+информации, а также метод вычисления суммы оплаты за товар. Для моделирования
+товарного чека реализовать класс Receipt, полями которого являются номер товарного чека,
+дата и время его создания, список покупаемых товаров. В классе Receipt реализовать
+методы добавления, изменения и удаления записи о покупаемом товаре, метод поиска
+информации об определенном виде товара по его коду, а также метод подсчета общей
+суммы, на которую были осуществлены покупки. Методы добавления и изменения
+принимают в качестве аргумента объект класса Goods. Метод поиска возвращает объект
+класса Goods в качестве результата.
 """
 
 
-class WordCard:
-    def __init__(self, foreign_word, translation):
-        self.foreign_word = foreign_word
-        self.translation = translation
-
-    def __str__(self):
-        return f"{self.foreign_word}: {self.translation}"
-
-
-class Dictionary:
-    def __init__(self, name):
+class Goods:
+    def __init__(self, code, name, price, quantity):
+        self.code = code
         self.name = name
-        self.cards = []
+        self.price = price
+        self.quantity = quantity
 
-    def __str__(self):
-        return f"Dictionary: {self.name}"
+    # Возвращаем код товара
+    def get_code(self):
+        return self.code
 
-    # перегрузка оператора индексирования []
-    def __getitem__(self, foreign_word):
-        for card in self.cards:
-            if card.foreign_word == foreign_word:
-                return card
-        raise KeyError(f"Word '{foreign_word}' not found in the dictionary.")
+    # Устанавливаем новый код товара
+    def set_code(self, code):
+        self.code = code
 
-    # метод для добавления новой карточки в словарь
-    def add_card(self, card):
-        if card.foreign_word not in [c.foreign_word for c in self.cards]:
-            self.cards.append(card)
+    # Вовзращаем название товара
+    def get_name(self):
+        return self.name
 
-    # метод для удаления карточки из словаря по иностранному слову
-    def remove_card(self, foreign_word):
-        self.cards = [card for card in self.cards if card.foreign_word != foreign_word]
+    # Новое название товара
+    def set_name(self, name):
+        self.name = name
 
-    # метод для поиска определенного слова в словаре
-    def search_word(self, foreign_word):
-        for card in self.cards:
-            if card.foreign_word == foreign_word:
-                return card
+    # Цена за ед. товара
+    def get_price(self):
+        return self.price
+
+    # Новая цена за ед. товара
+    def set_price(self, price):
+        self.price = price
+
+    # Количество товара, который купили
+    def get_quantity(self):
+        return self.quantity
+
+    # Новое количество товара, который купили
+    def set_quantity(self, quantity):
+        self.quantity = quantity
+
+    # Общая стоимость покупки
+    def calculate_total_price(self):
+        return self.price * self.quantity
+
+class Receipt:
+    def __init__(self, receipt_number, date_time):
+        self.receipt_number = receipt_number
+        self.date_time = date_time
+        self.items = []
+
+    # Добавляем покупку в чек
+    def add_item(self, goods):
+        self.items.append(goods)
+
+    def update_item(self, code, new_goods):
+        for i in range(len(self.items)):
+            if self.items[i].get_code() == code:
+                self.items[i] = new_goods
+                return True
+        return False
+
+    # Удаляем товар из чека по коду
+    def remove_item(self, code):
+        for i in range(len(self.items)):
+            if self.items[i].get_code() == code:
+                del self.items[i]
+                return True
+        return False
+
+    # Поиск товара по коду
+    def find_item_by_code(self, code):
+        for item in self.items:
+            if item.get_code() == code:
+                return item
         return None
 
-    # метод для объединения словарей
-    def union(self, other_dict):
-        new_dict = Dictionary(f"{self.name} + {other_dict.name}")
-        new_dict.cards = self.cards.copy()
-        for card in other_dict.cards:
-            if card.foreign_word not in [c.foreign_word for c in new_dict.cards]:
-                new_dict.cards.append(card)
-        return new_dict
-
-    # метод добавления совпадающих слов из 1 словаря во 2
-    def intersection(self, other_dict):
-        new_dict = Dictionary(f"{self.name} ∩ {other_dict.name}")
-        for card in self.cards:
-            if card.foreign_word in [c.foreign_word for c in other_dict.cards]:
-                new_dict.cards.append(card)
-        return new_dict
-
-    # метод добавления несовпадающих слов из 1 словаря во 2
-    def difference(self, other_dict):
-        new_dict = Dictionary(f"{self.name} - {other_dict.name}")
-        for card in self.cards:
-            if card.foreign_word not in [c.foreign_word for c in other_dict.cards]:
-                new_dict.cards.append(card)
-        return new_dict
+    # Общая сумма покупок
+    def calculate_total_amount(self):
+        total_amount = 0
+        for item in self.items:
+            total_amount += item.calculate_total_price()
+        return total_amount
 
 if __name__ == "__main__":
-    card1 = WordCard("hello", "привет")
-    card2 = WordCard("goodbye", "пока")
-    card3 = WordCard("cat", "кошка")
-    card4 = WordCard("dog", "собака")
 
-    dict1 = Dictionary("English-Russian Dictionary")
-    dict1.add_card(card1)
-    dict1.add_card(card2)
+    item1 = Goods("001", "Хлеб", 10, 2)
+    item2 = Goods("002", "Молоко", 5, 3)
 
-    dict2 = Dictionary("Russian-English Dictionary")
-    dict2.add_card(WordCard("привет", "hello"))
-    dict2.add_card(WordCard("пока", "goodbye"))
+    receipt = Receipt("0001", "20.05.2023 22:00")
+    print("Номер чека:", receipt.receipt_number)
+    print("Дата и время создания:", receipt.date_time)
 
-    print(dict1["hello"])
+    # Добавление товаров в чек
+    receipt.add_item(item1)
+    receipt.add_item(item2)
 
-    dict1.remove_card("goodbye")
+    # Изменение количества товара в чеке
+    updated_item = Goods("001", "Хлеб", 10, 5)
+    receipt.update_item("001", updated_item)
 
-    print(dict1.search_word("goodbye"))
+    # Удаление товара из чека
+    receipt.remove_item("001")
 
-    dict3 = dict1.union(dict2)
-    for card in dict3.cards:
-        print(card)
+    # Поиск информации о товаре по его коду
+    found_item = receipt.find_item_by_code("002")
+    if found_item:
+        print("Найден товар:", found_item.get_name())
+    else:
+        print("Товар не найден.")
 
-    dict4 = dict1.intersection(dict2)
-    for card in dict4.cards:
-        print(card)
+    # Подсчет общей суммы покупок
+    total_amount = receipt.calculate_total_amount()
+    print("Общая сумма покупок:", total_amount)
 
-    dict5 = dict1.difference(dict2)
-    for card in dict5.cards:
-        print(card)
 
 
