@@ -32,83 +32,90 @@ class Goods:
         self.price = price
         self.quantity = quantity
 
-    # Возвращаем код товара
     def get_code(self):
         return self.code
 
-    # Устанавливаем новый код товара
     def set_code(self, code):
         self.code = code
 
-    # Вовзращаем название товара
     def get_name(self):
         return self.name
 
-    # Новое название товара
     def set_name(self, name):
         self.name = name
 
-    # Цена за ед. товара
     def get_price(self):
         return self.price
 
-    # Новая цена за ед. товара
     def set_price(self, price):
         self.price = price
 
-    # Количество товара, который купили
     def get_quantity(self):
         return self.quantity
 
-    # Новое количество товара, который купили
     def set_quantity(self, quantity):
         self.quantity = quantity
 
-    # Общая стоимость покупки
     def calculate_total_price(self):
         return self.price * self.quantity
 
+    def __str__(self):
+        return f"Товар: {self.name}, Код: {self.code}, Цена: {self.price}, Количество: {self.quantity}"
+
+
 class Receipt:
+    MAX_SIZE = 10
+
     def __init__(self, receipt_number, date_time):
         self.receipt_number = receipt_number
         self.date_time = date_time
         self.items = []
+        self.size = Receipt.MAX_SIZE
+        self.count = 0
 
-    # Добавляем покупку в чек
     def add_item(self, goods):
-        self.items.append(goods)
+        if self.count < self.size:
+            self.items.append(goods)
+            self.count += 1
+            return True
+        else:
+            return False
 
     def update_item(self, code, new_goods):
-        for i in range(len(self.items)):
+        for i in range(self.count):
             if self.items[i].get_code() == code:
                 self.items[i] = new_goods
                 return True
         return False
 
-    # Удаляем товар из чека по коду
     def remove_item(self, code):
-        for i in range(len(self.items)):
+        for i in range(self.count):
             if self.items[i].get_code() == code:
                 del self.items[i]
+                self.count -= 1
                 return True
         return False
 
-    # Поиск товара по коду
     def find_item_by_code(self, code):
         for item in self.items:
             if item.get_code() == code:
                 return item
         return None
 
-    # Общая сумма покупок
     def calculate_total_amount(self):
         total_amount = 0
         for item in self.items:
             total_amount += item.calculate_total_price()
         return total_amount
 
-if __name__ == "__main__":
+    def __getitem__(self, index):
+        return self.items[index]
 
+    def size(self):
+        return self.size
+
+
+if __name__ == "__main__":
     item1 = Goods("001", "Хлеб", 10, 2)
     item2 = Goods("002", "Молоко", 5, 3)
 
@@ -116,27 +123,22 @@ if __name__ == "__main__":
     print("Номер чека:", receipt.receipt_number)
     print("Дата и время создания:", receipt.date_time)
 
-    # Добавление товаров в чек
     receipt.add_item(item1)
     receipt.add_item(item2)
 
-    # Изменение количества товара в чеке
     updated_item = Goods("001", "Хлеб", 10, 5)
     receipt.update_item("001", updated_item)
 
-    # Удаление товара из чека
     receipt.remove_item("001")
 
-    # Поиск информации о товаре по его коду
     found_item = receipt.find_item_by_code("002")
     if found_item:
         print("Найден товар:", found_item.get_name())
     else:
         print("Товар не найден.")
 
-    # Подсчет общей суммы покупок
     total_amount = receipt.calculate_total_amount()
     print("Общая сумма покупок:", total_amount)
 
-
-
+    # Проверка операции индексирования
+    print(receipt[0])
